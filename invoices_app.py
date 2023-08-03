@@ -3,8 +3,13 @@ import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
-# Define invoice_data outside the main() function to retain its values
-invoice_data = []
+# Create a custom SessionState class to persist data between button clicks
+class SessionState:
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+# Create a SessionState object
+session_state = SessionState(invoice_data=[])
 
 # Function to generate the invoice as a DataFrame
 def generate_invoice(invoice_data):
@@ -58,8 +63,8 @@ def main():
     item_amount = st.number_input("Item Amount", min_value=0.01, step=0.01)
 
     if st.button("Add Item"):
-        # Store invoice data in the global list
-        invoice_data.append({
+        # Store invoice data in the SessionState object
+        session_state.invoice_data.append({
             "Client Name": client_name,
             "Invoice Number": invoice_number,
             "Invoice Date": invoice_date,
@@ -68,21 +73,21 @@ def main():
         })
 
         # Create the invoice DataFrame
-        invoice_df = generate_invoice(invoice_data)
+        invoice_df = generate_invoice(session_state.invoice_data)
 
         # Display the invoice
         display_invoice(invoice_df)
 
     if st.button("Generate Invoice"):
         # Create the invoice DataFrame
-        invoice_df = generate_invoice(invoice_data)
+        invoice_df = generate_invoice(session_state.invoice_data)
 
         # Display the invoice
         display_invoice(invoice_df)
 
     if st.button("Download Invoice PDF"):
-        # Generate and download the PDF invoice using the global list
-        download_invoice_as_pdf(invoice_data)
+        # Generate and download the PDF invoice using the SessionState object
+        download_invoice_as_pdf(session_state.invoice_data)
 
 if __name__ == "__main__":
     main()
