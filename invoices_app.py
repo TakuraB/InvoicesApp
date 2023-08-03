@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 # Function to generate the invoice as a DataFrame
 def generate_invoice(invoice_data):
@@ -7,6 +9,10 @@ def generate_invoice(invoice_data):
 
 # Function to display the invoice as text
 def display_invoice(invoice_df):
+    if len(invoice_df) == 0:
+        st.warning("No items added to the invoice.")
+        return
+    
     st.subheader("Invoice Details:")
     st.text(f"Client Name: {invoice_df['Client Name'][0]}")
     st.text(f"Invoice Number: {invoice_df['Invoice Number'][0]}")
@@ -15,6 +21,26 @@ def display_invoice(invoice_df):
     for index, row in invoice_df.iterrows():
         st.text(f"  - {row['Item Description']}: ${row['Item Amount']:.2f}")
     st.subheader(f"Total: ${invoice_df['Item Amount'].sum():.2f}")
+
+# Function to generate and download PDF invoice
+def download_invoice_as_pdf(invoice_df):
+    if len(invoice_df) == 0:
+        st.warning("No items added to the invoice.")
+        return
+    
+    filename = "invoice.pdf"
+    pdf = canvas.Canvas(filename, pagesize=letter)
+
+    pdf.drawString(100, 750, "Invoice Details:")
+    y_position = 730
+    for index, row in invoice_df.iterrows():
+        y_position -= 20
+        pdf.drawString(120, y_position, f"{row['Item Description']}: ${row['Item Amount']:.2f}")
+    
+    pdf.drawString(120, y_position - 30, f"Total: ${invoice_df['Item Amount'].sum():.2f}")
+    pdf.save()
+
+    st.success(f"Invoice PDF created and downloaded. Click [here](./{filename}) to download.")
 
 # Main Streamlit application
 def main():
@@ -44,8 +70,11 @@ def main():
         # Display the invoice
         display_invoice(invoice_df)
 
+    if st.button("Download Invoice PDF"):
+        # Generate and download the PDF invoice
+        download_invoice_as_pdf(invoice_df)
+
 if __name__ == "__main__":
     # Initialize an empty list to store invoice data
     invoice_data = []
     main()
-
