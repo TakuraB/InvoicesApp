@@ -26,8 +26,8 @@ def display_invoice(invoice_df):
     st.subheader(f"Total: ${invoice_df['Item Amount'].sum():.2f}")
 
 # Function to generate and download PDF invoice
-def download_invoice_as_pdf(invoice_df):
-    if len(invoice_df) == 0:
+def download_invoice_as_pdf(invoice_data):
+    if len(invoice_data) == 0:
         st.warning("No items added to the invoice.")
         return
     
@@ -36,11 +36,12 @@ def download_invoice_as_pdf(invoice_df):
 
     pdf.drawString(100, 750, "Invoice Details:")
     y_position = 730
-    for index, row in invoice_df.iterrows():
+    for item in invoice_data:
         y_position -= 20
-        pdf.drawString(120, y_position, f"{row['Item Description']}: ${row['Item Amount']:.2f}")
+        pdf.drawString(120, y_position, f"{item['Item Description']}: ${item['Item Amount']:.2f}")
     
-    pdf.drawString(120, y_position - 30, f"Total: ${invoice_df['Item Amount'].sum():.2f}")
+    total_amount = sum(item['Item Amount'] for item in invoice_data)
+    pdf.drawString(120, y_position - 30, f"Total: ${total_amount:.2f}")
     pdf.save()
 
     st.success(f"Invoice PDF created and downloaded. Click [here](./{filename}) to download.")
@@ -58,13 +59,19 @@ def main():
 
     if st.button("Add Item"):
         # Store invoice data in the global list
-        invoice_data = invoice_data.append({
+        invoice_data.append({
             "Client Name": client_name,
             "Invoice Number": invoice_number,
             "Invoice Date": invoice_date,
             "Item Description": item_description,
             "Item Amount": item_amount
         })
+
+        # Create the invoice DataFrame
+        invoice_df = generate_invoice(invoice_data)
+
+        # Display the invoice
+        display_invoice(invoice_df)
 
     if st.button("Generate Invoice"):
         # Create the invoice DataFrame
@@ -74,8 +81,8 @@ def main():
         display_invoice(invoice_df)
 
     if st.button("Download Invoice PDF"):
-        # Generate and download the PDF invoice
-        download_invoice_as_pdf(invoice_df)
+        # Generate and download the PDF invoice using the global list
+        download_invoice_as_pdf(invoice_data)
 
 if __name__ == "__main__":
     main()
