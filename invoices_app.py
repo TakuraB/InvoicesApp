@@ -3,6 +3,9 @@ import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
+# Define invoice_data outside the main() function to retain its values
+invoice_data = []
+
 # Function to generate the invoice as a DataFrame
 def generate_invoice(invoice_data):
     return pd.DataFrame(invoice_data)
@@ -54,7 +57,7 @@ def main():
     item_amount = st.number_input("Item Amount", min_value=0.01, step=0.01)
 
     if st.button("Add Item"):
-        # Store invoice data in a list of dictionaries
+        # Store invoice data in the global list
         invoice_data.append({
             "Client Name": client_name,
             "Invoice Number": invoice_number,
@@ -75,6 +78,4 @@ def main():
         download_invoice_as_pdf(invoice_df)
 
 if __name__ == "__main__":
-    # Initialize an empty list to store invoice data
-    invoice_data = []
     main()
