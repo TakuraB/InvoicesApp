@@ -58,7 +58,7 @@ def main():
 
     if st.button("Add Item"):
         # Store invoice data in the global list
-        invoice_data.append({
+        invoice_data = invoice_data.append({
             "Client Name": client_name,
             "Invoice Number": invoice_number,
             "Invoice Date": invoice_date,
