@@ -56,22 +56,25 @@ def main():
 
     while not generate_invoice_clicked:
         # Collect user input
-        client_name = st.text_input("Client Name")
-        invoice_number = st.text_input("Invoice Number")
-        invoice_date = st.date_input("Invoice Date")
-        item_description = st.text_area("Item Description")
-        item_amount = st.number_input("Item Amount", min_value=0.01, step=0.01)
+        with st.form("invoice_form"):
+            client_name = st.text_input("Client Name", key="client_name")
+            invoice_number = st.text_input("Invoice Number", key="invoice_number")
+            invoice_date = st.date_input("Invoice Date", key="invoice_date")
+            item_description = st.text_area("Item Description", key="item_description")
+            item_amount = st.number_input("Item Amount", min_value=0.01, step=0.01, key="item_amount")
 
-        if st.button("Add Item"):
-            # Store invoice data in the session state
-            st.session_state.invoice_data.append({
-                "Client Name": client_name,
-                "Invoice Number": invoice_number,
-                "Invoice Date": invoice_date,
-                "Item Description": item_description,
-                "Item Amount": item_amount
-            })
+            # Check if the "Add Item" button is clicked
+            if st.form_submit_button("Add Item"):
+                # Store invoice data in the session state
+                st.session_state.invoice_data.append({
+                    "Client Name": client_name,
+                    "Invoice Number": invoice_number,
+                    "Invoice Date": invoice_date,
+                    "Item Description": item_description,
+                    "Item Amount": item_amount
+                })
 
+        # Check if the "Generate Invoice" button is clicked
         if st.button("Generate Invoice"):
             # Set the flag to True to terminate the while loop
             generate_invoice_clicked = True
