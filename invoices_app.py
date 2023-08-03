@@ -51,38 +51,29 @@ def main():
     if 'invoice_data' not in st.session_state:
         st.session_state.invoice_data = []
 
-    # Flag to control the while loop
-    generate_invoice_clicked = False
+    # Collect user input
+    client_name = st.text_input("Client Name", key="client_name")
+    invoice_number = st.text_input("Invoice Number", key="invoice_number")
+    invoice_date = st.date_input("Invoice Date", key="invoice_date")
+    item_description = st.text_area("Item Description", key="item_description")
+    item_amount = st.number_input("Item Amount", min_value=0.01, step=0.01, key="item_amount")
 
-    while not generate_invoice_clicked:
-        # Collect user input
-        client_name = st.text_input("Client Name")
-        invoice_number = st.text_input("Invoice Number")
-        invoice_date = st.date_input("Invoice Date")
-        item_description = st.text_area("Item Description")
-        item_amount = st.number_input("Item Amount", min_value=0.01, step=0.01)
+    if st.button("Add Item"):
+        # Store invoice data in the session state
+        st.session_state.invoice_data.append({
+            "Client Name": client_name,
+            "Invoice Number": invoice_number,
+            "Invoice Date": invoice_date,
+            "Item Description": item_description,
+            "Item Amount": item_amount
+        })
 
-        # Check if the "Add Item" button is clicked
-        if st.button("Add Item"):
-            # Store invoice data in the session state
-            st.session_state.invoice_data.append({
-                "Client Name": client_name,
-                "Invoice Number": invoice_number,
-                "Invoice Date": invoice_date,
-                "Item Description": item_description,
-                "Item Amount": item_amount
-            })
+    if st.button("Generate Invoice"):
+        # Create the invoice DataFrame
+        invoice_df = generate_invoice(st.session_state.invoice_data)
 
-        # Check if the "Generate Invoice" button is clicked
-        if st.button("Generate Invoice"):
-            # Set the flag to True to terminate the while loop
-            generate_invoice_clicked = True
-
-    # Create the invoice DataFrame
-    invoice_df = generate_invoice(st.session_state.invoice_data)
-
-    # Display the invoice
-    display_invoice(invoice_df)
+        # Display the invoice
+        display_invoice(invoice_df)
 
     if st.button("Download Invoice PDF"):
         # Generate and download the PDF invoice using the session state data
