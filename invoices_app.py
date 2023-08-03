@@ -5,6 +5,17 @@ import pandas as pd
 def generate_invoice(invoice_data):
     return pd.DataFrame(invoice_data)
 
+# Function to display the invoice as text
+def display_invoice(invoice_df):
+    st.subheader("Invoice Details:")
+    st.text(f"Client Name: {invoice_df['Client Name'][0]}")
+    st.text(f"Invoice Number: {invoice_df['Invoice Number'][0]}")
+    st.text(f"Invoice Date: {invoice_df['Invoice Date'][0]}")
+    st.text("Items:")
+    for index, row in invoice_df.iterrows():
+        st.text(f"  - {row['Item Description']}: ${row['Item Amount']:.2f}")
+    st.subheader(f"Total: ${invoice_df['Item Amount'].sum():.2f}")
+
 # Main Streamlit application
 def main():
     st.title("Invoice Generator")
@@ -31,9 +42,10 @@ def main():
         invoice_df = generate_invoice(invoice_data)
 
         # Display the invoice
-        st.dataframe(invoice_df)
+        display_invoice(invoice_df)
 
 if __name__ == "__main__":
     # Initialize an empty list to store invoice data
     invoice_data = []
     main()
+
