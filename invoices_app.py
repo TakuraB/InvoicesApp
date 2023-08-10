@@ -22,42 +22,30 @@ def display_invoice(invoice_df):
         st.text(f"  - {row['Item Description']}: ${row['Item Amount']:.2f}")
     st.subheader(f"Total: ${invoice_df['Item Amount'].sum():.2f}")
 
-# Function to generate and download PDF invoice
-def download_invoice_as_pdf(invoice_data):
+# Function to generate text invoice content
+def generate_invoice_text(invoice_data):
     if len(invoice_data) == 0:
-        st.warning("No items added to the invoice.")
-        return
-    
-    filename = "invoice.pdf"
-    pdf = canvas.Canvas(filename, pagesize=letter)
+        return "No items added to the invoice."
 
-    pdf.drawString(100, 750, "Invoice Details:")
-    y_position = 730
+    invoice_text = "Invoice Details:\n"
     for item in invoice_data:
-        y_position -= 20
-        pdf.drawString(120, y_position, f"{item['Item Description']}: ${item['Item Amount']:.2f}")
+        invoice_text += f"{item['Item Description']}: ${item['Item Amount']:.2f}\n"
     
     total_amount = sum(item['Item Amount'] for item in invoice_data)
-    pdf.drawString(120, y_position - 30, f"Total: ${total_amount:.2f}")
-    pdf.save()
-
-    st.success(f"Invoice PDF created and downloaded. Click [here](./{filename}) to download.")
-# Function to generate and download text invoice
-def download_invoice_as_text(invoice_data):
-    if len(invoice_data) == 0:
-        st.warning("No items added to the invoice.")
-        return
+    invoice_text += f"Total: ${total_amount:.2f}\n"
     
-    filename = "invoice.txt"
-    with open(filename, 'w') as txt_file:
-        txt_file.write("Invoice Details:\n")
-        for item in invoice_data:
-            txt_file.write(f"{item['Item Description']}: ${item['Item Amount']:.2f}\n")
+    return invoice_text
+    if st.button("Download Invoice Text"):
+        # Generate the text invoice using the session state data
+        invoice_text = generate_invoice_text(st.session_state.invoice_data)
         
-        total_amount = sum(item['Item Amount'] for item in invoice_data)
-        txt_file.write(f"Total: ${total_amount:.2f}\n")
+        # Display the invoice text
+        st.subheader("Invoice Text:")
+        st.text_area("Invoice Content", value=invoice_text, height=300)
+        
+        # Display a button to download the invoice text as a file
+        st.download_button("Download Invoice Text", data=invoice_text.encode('utf-8'), file_name="invoice.txt")
 
-    return filename  # Return the filename to use for the download link
 # Main Streamlit application
 def main():
     st.title("Invoice Generator")
