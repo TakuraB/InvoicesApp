@@ -45,6 +45,22 @@ def generate_invoice_text(invoice_data):
         
         # Display a button to download the invoice text as a file
         st.download_button("Download Invoice Text", data=invoice_text.encode('utf-8'), file_name="invoice.txt")
+# Function to generate and download text invoice
+def download_invoice_as_text(invoice_data):
+    if len(invoice_data) == 0:
+        st.warning("No items added to the invoice.")
+        return
+    
+    filename = "invoice.txt"
+    with open(filename, 'w') as txt_file:
+        txt_file.write("Invoice Details:\n")
+        for item in invoice_data:
+            txt_file.write(f"{item['Item Description']}: ${item['Item Amount']:.2f}\n")
+        
+        total_amount = sum(item['Item Amount'] for item in invoice_data)
+        txt_file.write(f"Total: ${total_amount:.2f}\n")
+
+    return filename  # Return the filename to use for the download link
 
 # Main Streamlit application
 def main():
