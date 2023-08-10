@@ -78,15 +78,12 @@ def main():
         # Display the invoice
         display_invoice(invoice_df)
 
-    if st.button("Download Invoice PDF"):
-        # Generate and download the PDF invoice using the session state data
-        download_invoice_as_pdf(st.session_state.invoice_data)
     if st.button("Download Invoice Text"):
         # Generate the text invoice using the session state data
         filename = download_invoice_as_text(st.session_state.invoice_data)
         
         # Display the download link for the text file
-        st.download_button("Download Invoice Text", filename, key="download_button")
+        st.download_button("Download Invoice Textfile", filename, key="download_button")
 
 
 if __name__ == "__main__":
