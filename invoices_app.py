@@ -57,8 +57,7 @@ def download_invoice_as_text(invoice_data):
         total_amount = sum(item['Item Amount'] for item in invoice_data)
         txt_file.write(f"Total: ${total_amount:.2f}\n")
 
-    st.success(f"Invoice text file created and downloaded. Click [here](./{filename}) to download.")
-
+    return filename  # Return the filename to use for the download link
 # Main Streamlit application
 def main():
     st.title("Invoice Generator")
@@ -95,8 +94,12 @@ def main():
         # Generate and download the PDF invoice using the session state data
         download_invoice_as_pdf(st.session_state.invoice_data)
     if st.button("Download Invoice Text"):
-        # Generate and download the text invoice using the session state data
-        download_invoice_as_text(st.session_state.invoice_data)
+        # Generate the text invoice using the session state data
+        filename = download_invoice_as_text(st.session_state.invoice_data)
+        
+        # Display the download link for the text file
+        st.download_button("Download Invoice Text", filename, key="download_button")
+
 
 if __name__ == "__main__":
     main()
