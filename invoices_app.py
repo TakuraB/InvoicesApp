@@ -96,10 +96,13 @@ def main():
 
     if st.button("Download Invoice Text"):
         # Generate the text invoice using the session state data
-        filename = download_invoice_as_text(st.session_state.invoice_data)
+        invoice_text = generate_invoice_text(st.session_state.invoice_data)
         
-        # Display the download link for the text file
-        st.download_button("Download Invoice Textfile", filename, key="download_button")
+        # Display the invoice text
+        st.subheader("Invoice Text:")
+        st.text_area("Invoice Content", value=invoice_text, height=300)
+        # Display a button to download the invoice text as a file
+        st.download_button("Download Invoice Text", data=invoice_text.encode('utf-8'), file_name="invoice.txt")
 
 
 if __name__ == "__main__":
